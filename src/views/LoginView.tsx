@@ -16,8 +16,11 @@ export function LoginView() {
         setLoading(true);
         setError(null);
         const formData = new FormData(e.currentTarget);
+        const email = formData.get("email") as string;
+        const password = formData.get("password") as string;
+
         try {
-            await signIn("password", formData);
+            await signIn("password", { email, password, flow: step });
         } catch (err) {
             console.error(err);
             setError("Email o contraseña incorrectos");
