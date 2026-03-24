@@ -11,7 +11,7 @@ import { Input } from '@/components/ui/input';
 import type { ProjectStatus } from '@/store/types';
 import { cn } from '@/lib/utils';
 import { useMutation } from 'convex/react';
-import { api } from '../../convex/_generated/api';
+import { api } from '@/generated_mock/api';
 import type { Id } from '../../convex/_generated/dataModel';
 
 const PRESET_COLORS = ['#E11D48', '#2563EB', '#059669', '#D97706', '#7C3AED', '#DB2777', '#0891B2', '#65A30D'];

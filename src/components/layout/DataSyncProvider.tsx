@@ -1,6 +1,6 @@
 import { useEffect } from "react";
 import { useQuery } from "convex/react";
-import { api } from "../../../convex/_generated/api";
+import { api } from "@/generated_mock/api";
 import { useDflowStore } from "../../store/useDflowStore";
 
 export function DataSyncProvider({ children }: { children: React.ReactNode }) {
