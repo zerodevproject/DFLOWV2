@@ -19,6 +19,8 @@ const STATUS_CONFIG: Record<ProjectStatus, { label: string; color: string }> = {
     active: { label: 'Activo', color: '#059669' },
     background: { label: 'En Pausa', color: '#D97706' },
     archived: { label: 'Archivado', color: '#6B7280' },
+    'on-hold': { label: 'En Espera', color: '#9333EA' },
+    completed: { label: 'Completado', color: '#2563EB' },
 };
 
 interface ProjectsViewProps {
@@ -100,7 +102,7 @@ export function ProjectsView({ onSelectProject }: ProjectsViewProps) {
 
     function handleAdd() {
         if (!newName.trim()) return;
-        addProject({ name: newName.trim(), emoji: newEmoji, color: newColor, description: newDesc.trim(), status: 'active' });
+        addProject({ name: newName.trim(), emoji: newEmoji, color: newColor, description: newDesc.trim(), status: 'active', totalHours: 0, weekProgress: 0 });
         setNewName(''); setNewEmoji('⚡'); setNewColor(PRESET_COLORS[0]); setNewDesc('');
         setAddOpen(false);
     }
