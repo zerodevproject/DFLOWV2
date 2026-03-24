@@ -10,7 +10,7 @@ import { Button } from '@/components/ui/button';
 import { CheckCircle2, XCircle, Clock } from 'lucide-react';
 import type { TimeBlock, Project } from '@/store/types';
 import { useMutation } from 'convex/react';
-import { api } from '@/generated_mock/api';
+import { api } from '../../../convex/_generated/api';
 import type { Id } from '../../../convex/_generated/dataModel';
 
 interface ConfirmSessionModalProps {

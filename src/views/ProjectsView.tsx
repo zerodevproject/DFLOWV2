@@ -12,7 +12,7 @@ import { Button } from '@/components/ui/button';
 import type { ProjectStatus } from '@/store/types';
 import { cn } from '@/lib/utils';
 import { useMutation } from 'convex/react';
-import { api } from '@/generated_mock/api';
+import { api } from '../../convex/_generated/api';
 
 const PRESET_COLORS = ['#E11D48', '#2563EB', '#059669', '#D97706', '#7C3AED', '#DB2777', '#0891B2', '#65A30D'];
 const PRESET_EMOJIS = ['⚡', '🔮', '🌊', '🎸', '🚀', '🎯', '🔥', '💡', '🏗️', '🎵', '⚙️', '🌱'];

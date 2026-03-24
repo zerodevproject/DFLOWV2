@@ -10,4 +10,5 @@ export const api: any = {
     healthLogs: { getForDate: "healthLogs:getForDate", upsert: "healthLogs:upsert" },
     flowCycles: { get: "flowCycles:get", update: "flowCycles:update" },
     users: { viewer: "users:viewer", update: "users:update" },
+    parkingLot: { add: "parkingLot:add", markResolved: "parkingLot:markResolved", remove: "parkingLot:remove" },
 };

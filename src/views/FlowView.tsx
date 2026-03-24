@@ -10,7 +10,7 @@ import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import type { DaySlotType, TemplateSlot } from '@/store/types';
 import { useMutation } from 'convex/react';
-import { api } from '@/generated_mock/api';
+import { api } from '../../convex/_generated/api';
 
 // ── Week Scoreboard ──────────────────────────────────────────
 

@@ -13,7 +13,7 @@ import { Flame } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import type { TimeBlock, Project, FastingState } from '@/store/types';
 import { useMutation } from 'convex/react';
-import { api } from '@/generated_mock/api';
+import { api } from '../../convex/_generated/api';
 import type { Id } from '../../../convex/_generated/dataModel';
 
 const HOUR_LABELS = Array.from({ length: TOTAL_HOURS + 1 }, (_, i) => {
