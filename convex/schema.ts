@@ -5,11 +5,9 @@ import { authTables } from "@convex-dev/auth/server";
 export default defineSchema({
     ...authTables,
 
-    // User Profiles (Extended from Auth)
+    // Extend User Profiles with custom fields
     users: defineTable({
-        name: v.optional(v.string()),
-        image: v.optional(v.string()),
-        email: v.optional(v.string()),
+        ...authTables.users.fields,
         tagline: v.optional(v.string()),
     }).index("by_email", ["email"]),
 
