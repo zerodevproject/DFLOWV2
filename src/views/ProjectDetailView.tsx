@@ -10,6 +10,9 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import type { ProjectStatus } from '@/store/types';
 import { cn } from '@/lib/utils';
+import { useMutation } from 'convex/react';
+import { api } from '@/generated_mock/api';
+import type { Id } from '../../convex/_generated/dataModel';
 
 const PRESET_COLORS = ['#E11D48', '#2563EB', '#059669', '#D97706', '#7C3AED', '#DB2777', '#0891B2', '#65A30D'];
 const PRESET_EMOJIS = ['⚡', '🔮', '🌊', '🎸', '🚀', '🎯', '🔥', '💡', '🏗️', '🎵', '⚙️', '🌱'];
@@ -27,8 +30,8 @@ interface ProjectDetailViewProps {
 
 export function ProjectDetailView({ projectId, onBack }: ProjectDetailViewProps) {
     const project = useDflowStore((s) => s.projects.find((p) => p.id === projectId));
-    const updateProject = useDflowStore((s) => s.updateProject);
-    const deleteProject = useDflowStore((s) => s.deleteProject);
+    const updateProject = useMutation(api.projects.update);
+    const deleteProject = useMutation(api.projects.remove);
     const recentBlocks = useDflowStore(useShallow((s) =>
         s.timeBlocks
             .filter((b) => b.projectId === projectId)
@@ -57,16 +60,16 @@ export function ProjectDetailView({ projectId, onBack }: ProjectDetailViewProps)
     }
 
     function saveName() {
-        if (name.trim()) updateProject(projectId, { name: name.trim() });
+        if (name.trim()) updateProject({ id: projectId as Id<"projects">, updates: { name: name.trim() } });
         setEditingName(false);
     }
     function saveDesc() {
-        updateProject(projectId, { description: description.trim() });
+        updateProject({ id: projectId as Id<"projects">, updates: { description: description.trim() } });
         setEditingDesc(false);
     }
-    function handleDelete() {
+    async function handleDelete() {
         if (!confirmDelete) { setConfirmDelete(true); return; }
-        deleteProject(projectId);
+        await deleteProject({ id: projectId as Id<"projects"> });
         onBack();
     }
 
@@ -95,7 +98,7 @@ export function ProjectDetailView({ projectId, onBack }: ProjectDetailViewProps)
                 {showEmojiPicker && (
                     <div className="absolute top-16 left-5 bg-white rounded-2xl p-3 shadow-xl border border-border z-10 flex flex-wrap gap-2 w-56">
                         {PRESET_EMOJIS.map((e) => (
-                            <button key={e} onClick={() => { updateProject(projectId, { emoji: e }); setShowEmojiPicker(false); }}
+                            <button key={e} onClick={() => { updateProject({ id: projectId as Id<"projects">, updates: { emoji: e } }); setShowEmojiPicker(false); }}
                                 className={cn('w-9 h-9 rounded-xl text-xl flex items-center justify-center hover:bg-muted', project.emoji === e && 'bg-muted')}>
                                 {e}
                             </button>
@@ -133,7 +136,7 @@ export function ProjectDetailView({ projectId, onBack }: ProjectDetailViewProps)
                 {showColorPicker && (
                     <div className="absolute bottom-4 left-5 bg-white rounded-2xl p-3 shadow-xl border border-border z-10 flex flex-wrap gap-2 w-56">
                         {PRESET_COLORS.map((c) => (
-                            <button key={c} onClick={() => { updateProject(projectId, { color: c }); setShowColorPicker(false); }}
+                            <button key={c} onClick={() => { updateProject({ id: projectId as Id<"projects">, updates: { color: c } }); setShowColorPicker(false); }}
                                 className={cn('w-8 h-8 rounded-full transition-transform hover:scale-110', project.color === c && 'ring-2 ring-offset-2 ring-foreground/30')}
                                 style={{ backgroundColor: c }} />
                         ))}
@@ -192,7 +195,7 @@ export function ProjectDetailView({ projectId, onBack }: ProjectDetailViewProps)
                     {STATUS_OPTIONS.map((opt) => (
                         <button
                             key={opt.value}
-                            onClick={() => updateProject(projectId, { status: opt.value })}
+                            onClick={() => updateProject({ id: projectId as Id<"projects">, updates: { status: opt.value } })}
                             className={cn(
                                 'w-full flex items-center gap-3 p-3 rounded-xl border text-left transition-all',
                                 project.status === opt.value

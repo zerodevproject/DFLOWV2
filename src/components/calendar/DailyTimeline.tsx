@@ -12,6 +12,9 @@ import { CurrentTimeLine, TIMELINE_START_HOUR, TIMELINE_END_HOUR, TOTAL_HOURS } 
 import { Flame } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import type { TimeBlock, Project, FastingState } from '@/store/types';
+import { useMutation } from 'convex/react';
+import { api } from '@/generated_mock/api';
+import type { Id } from '../../../convex/_generated/dataModel';
 
 const HOUR_LABELS = Array.from({ length: TOTAL_HOURS + 1 }, (_, i) => {
     const h = TIMELINE_START_HOUR + i;
@@ -33,11 +36,18 @@ const FASTING_OPTS: { v: FastingState; label: string; emoji: string; color: stri
 function QuickFasting({ date }: { date: string }) {
     const [open, setOpen] = useState(false);
     const healthLog = useDflowStore(selectHealthLogForDate(date));
-    const upsertHealthLog = useDflowStore((s) => s.upsertHealthLog);
+    const upsertMutation = useMutation(api.healthLogs.upsert);
     const fasting = healthLog?.fastingState ?? 'none';
 
-    function setFasting(v: FastingState) {
-        upsertHealthLog(date, { fastingState: v });
+    async function setFasting(v: FastingState) {
+        await upsertMutation({
+            date,
+            fastingState: v as any,
+            didExercise: healthLog?.didExercise ?? false,
+            wifeTime: healthLog?.wifeTime ?? false,
+            churchTime: healthLog?.churchTime ?? false,
+            notes: healthLog?.notes
+        });
         setOpen(false);
     }
 
@@ -91,7 +101,8 @@ export function DailyTimeline({ date, onBlockTap, onSlotTap }: DailyTimelineProp
         s.timeBlocks.filter((b) => b.date === date).sort((a, b) => a.startTime.localeCompare(b.startTime))
     ));
     const projects = useDflowStore(useShallow((s) => s.projects));
-    const deleteTimeBlock = useDflowStore((s) => s.deleteTimeBlock);
+    const removeMutation = useMutation(api.timeBlocks.remove);
+    const deleteTimeBlock = (id: string) => removeMutation({ id: id as Id<"timeBlocks"> });
     const healthLog = useDflowStore(selectHealthLogForDate(date));
     const fastingState = healthLog?.fastingState ?? 'none';
 

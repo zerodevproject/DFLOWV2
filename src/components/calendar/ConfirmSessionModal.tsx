@@ -8,8 +8,10 @@ import { useState } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { CheckCircle2, XCircle, Clock } from 'lucide-react';
-import { useDflowStore } from '@/store/useDflowStore';
 import type { TimeBlock, Project } from '@/store/types';
+import { useMutation } from 'convex/react';
+import { api } from '@/generated_mock/api';
+import type { Id } from '../../../convex/_generated/dataModel';
 
 interface ConfirmSessionModalProps {
     open: boolean;
@@ -25,18 +27,40 @@ function blockPlannedHours(b: TimeBlock): number {
 }
 
 export function ConfirmSessionModal({ open, onClose, block, project }: ConfirmSessionModalProps) {
-    const { confirmBlock, missBlock } = useDflowStore();
+    const upsertTimeBlock = useMutation(api.timeBlocks.upsert);
     const planned = blockPlannedHours(block);
     const [actualHours, setActualHours] = useState(planned.toFixed(1));
 
-    function handleComplete() {
+    async function handleComplete() {
         const hrs = parseFloat(actualHours) || planned;
-        confirmBlock(block.id, hrs);
+        await upsertTimeBlock({
+            id: block.id as Id<"timeBlocks">,
+            type: block.type,
+            title: block.title,
+            projectId: block.projectId as Id<"projects"> | undefined,
+            date: block.date,
+            startTime: block.startTime,
+            endTime: block.endTime,
+            status: 'completed',
+            actualHours: hrs,
+            notes: block.notes
+        });
         onClose();
     }
 
-    function handleMiss() {
-        missBlock(block.id);
+    async function handleMiss() {
+        await upsertTimeBlock({
+            id: block.id as Id<"timeBlocks">,
+            type: block.type,
+            title: block.title,
+            projectId: block.projectId as Id<"projects"> | undefined,
+            date: block.date,
+            startTime: block.startTime,
+            endTime: block.endTime,
+            status: 'missed',
+            actualHours: 0,
+            notes: block.notes
+        });
         onClose();
     }
 

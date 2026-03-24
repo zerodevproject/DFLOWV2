@@ -38,7 +38,17 @@ export const markResolved = mutation({
     handler: async (ctx, args) => {
         const userId = await getAuthUserId(ctx);
         if (!userId) throw new Error("Not authenticated");
-        // We could theoretically verify ownership here, but for now simple patch is enough
         return await ctx.db.patch(args.id, { isResolved: true });
+    },
+});
+
+export const remove = mutation({
+    args: { id: v.id("parkingLot") },
+    handler: async (ctx, args) => {
+        const userId = await getAuthUserId(ctx);
+        if (!userId) throw new Error("Not authenticated");
+        const existing = await ctx.db.get(args.id);
+        if (!existing || existing.userId !== userId) throw new Error("Unauthorized");
+        return await ctx.db.delete(args.id);
     },
 });

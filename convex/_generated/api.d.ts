@@ -11,6 +11,7 @@
 import type * as auth from "../auth.js";
 import type * as flowCycles from "../flowCycles.js";
 import type * as healthLogs from "../healthLogs.js";
+import type * as http from "../http.js";
 import type * as parkingLot from "../parkingLot.js";
 import type * as projects from "../projects.js";
 import type * as timeBlocks from "../timeBlocks.js";
@@ -26,6 +27,7 @@ declare const fullApi: ApiFromModules<{
   auth: typeof auth;
   flowCycles: typeof flowCycles;
   healthLogs: typeof healthLogs;
+  http: typeof http;
   parkingLot: typeof parkingLot;
   projects: typeof projects;
   timeBlocks: typeof timeBlocks;

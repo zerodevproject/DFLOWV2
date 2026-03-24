@@ -8,16 +8,20 @@ import { User, Lightbulb, Check, RotateCcw, Trash2, Pencil } from 'lucide-react'
 import { useDflowStore } from '@/store/useDflowStore';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
+import { useMutation } from 'convex/react';
+import { api } from '@/generated_mock/api';
+import type { Id } from '../../convex/_generated/dataModel';
 
 
 function ProfileSection() {
-    const { userProfile, updateProfile } = useDflowStore();
+    const { userProfile } = useDflowStore();
+    const updateProfile = useMutation(api.users.update);
     const [editing, setEditing] = useState(false);
     const [name, setName] = useState(userProfile?.name || 'Usuario');
     const [tagline, setTagline] = useState(userProfile?.tagline || 'Productor Metabólico');
 
-    function handleSave() {
-        updateProfile({ name: name.trim(), tagline: tagline.trim() });
+    async function handleSave() {
+        await updateProfile({ name: name.trim(), tagline: tagline.trim() });
         setEditing(false);
     }
 
@@ -54,14 +58,21 @@ function ProfileSection() {
 function ParkingLotSection() {
     const parkingItems = useDflowStore(useShallow((s) => s.parkingItems));
     const projects = useDflowStore(useShallow((s) => s.projects));
-    const { addParkingItem, resolveParking, deleteParkingItem } = useDflowStore();
+
+    const addMutation = useMutation(api.parkingLot.add);
+    const resolveMutation = useMutation(api.parkingLot.markResolved);
+    const deleteMutation = useMutation(api.parkingLot.remove);
+
     const [idea, setIdea] = useState('');
 
     const unresolved = parkingItems.filter((i) => !i.isResolved);
 
-    function handleSave(projectId?: string) {
+    async function handleSave(projectId?: string) {
         if (!idea.trim()) return;
-        addParkingItem(idea.trim(), projectId);
+        await addMutation({
+            content: idea.trim(),
+            projectId: projectId as Id<"projects"> | undefined
+        });
         setIdea('');
     }
 
@@ -101,7 +112,7 @@ function ParkingLotSection() {
                         const project = item.projectId ? projects.find((p) => p.id === item.projectId) : null;
                         return (
                             <div key={item.id} className="bg-white rounded-xl border border-border p-3 flex gap-2.5 items-start group">
-                                <button onClick={() => resolveParking(item.id)}
+                                <button onClick={() => resolveMutation({ id: item.id as Id<"parkingLot"> })}
                                     className="mt-0.5 w-5 h-5 rounded-full border border-border shrink-0 hover:bg-green-100 hover:border-green-400 flex items-center justify-center transition-colors">
                                     <Check className="w-3 h-3 opacity-0 group-hover:opacity-100 text-green-600 transition-opacity" />
                                 </button>
@@ -114,7 +125,7 @@ function ParkingLotSection() {
                                         </span>
                                     )}
                                 </div>
-                                <button onClick={() => deleteParkingItem(item.id)}
+                                <button onClick={() => deleteMutation({ id: item.id as Id<"parkingLot"> })}
                                     className="opacity-0 group-hover:opacity-100 transition-opacity p-1 hover:text-destructive">
                                     <Trash2 className="w-3.5 h-3.5" />
                                 </button>
@@ -133,7 +144,7 @@ function ParkingLotSection() {
 
 function BackgroundProjectsSection() {
     const projects = useDflowStore(useShallow((s) => s.projects));
-    const updateProject = useDflowStore((s) => s.updateProject);
+    const updateProject = useMutation(api.projects.update);
     const bg = projects.filter((p) => p.status === 'background');
     const archived = projects.filter((p) => p.status === 'archived');
 
@@ -151,7 +162,7 @@ function BackgroundProjectsSection() {
                                 <p className="font-bold text-sm truncate">{p.name}</p>
                                 <p className="text-xs text-muted-foreground line-clamp-1">{p.description}</p>
                             </div>
-                            <button onClick={() => updateProject(p.id, { status: 'active' })}
+                            <button onClick={() => updateProject({ id: p.id as Id<"projects">, updates: { status: 'active' } })}
                                 className="flex items-center gap-1 text-xs font-bold text-primary hover:bg-primary/10 px-2 py-1.5 rounded-lg transition-colors shrink-0">
                                 <RotateCcw className="w-3.5 h-3.5" /> Activar
                             </button>
@@ -169,7 +180,7 @@ function BackgroundProjectsSection() {
                             <div className="flex-1 min-w-0">
                                 <p className="font-bold text-sm truncate line-through text-muted-foreground">{p.name}</p>
                             </div>
-                            <button onClick={() => updateProject(p.id, { status: 'active' })}
+                            <button onClick={() => updateProject({ id: p.id as Id<"projects">, updates: { status: 'active' } })}
                                 className="flex items-center gap-1 text-xs font-bold text-muted-foreground hover:text-foreground px-2 py-1.5 rounded-lg transition-colors shrink-0">
                                 <RotateCcw className="w-3.5 h-3.5" /> Revivir
                             </button>

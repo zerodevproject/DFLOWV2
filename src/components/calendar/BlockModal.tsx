@@ -12,6 +12,9 @@ import { useShallow } from 'zustand/react/shallow';
 import { useDflowStore } from '@/store/useDflowStore';
 import type { TimeBlock, BlockType } from '@/store/types';
 import { cn } from '@/lib/utils';
+import { useMutation } from 'convex/react';
+import { api } from '@/generated_mock/api';
+import type { Id } from '../../../convex/_generated/dataModel';
 
 const BLOCK_TYPES: { value: BlockType; label: string; icon: string; color: string }[] = [
     { value: 'work', label: 'Trabajo', icon: '💻', color: '#2563EB' },
@@ -29,7 +32,9 @@ interface BlockModalProps {
 }
 
 export function BlockModal({ open, onClose, existingBlock, defaultDate, defaultStartTime }: BlockModalProps) {
-    const { addTimeBlock, updateTimeBlock, deleteTimeBlock } = useDflowStore();
+    const upsertTimeBlock = useMutation(api.timeBlocks.upsert);
+    const removeTimeBlock = useMutation(api.timeBlocks.remove);
+
     const projects = useDflowStore(useShallow((s) => s.projects.filter((p) => p.status === 'active')));
 
     const today = new Date().toISOString().split('T')[0];
@@ -63,20 +68,23 @@ export function BlockModal({ open, onClose, existingBlock, defaultDate, defaultS
 
     const needsProject = type === 'work' || type === 'flow';
 
-    function handleSave() {
+    async function handleSave() {
         if (!title.trim()) return;
         const data = {
             type,
             title: title.trim(),
-            projectId: needsProject && projectId ? projectId : undefined,
+            projectId: needsProject && projectId ? (projectId as Id<"projects">) : undefined,
             date,
             startTime,
             endTime,
             notes: notes.trim() || undefined,
             status: 'planned' as const,
         };
-        if (existingBlock) updateTimeBlock(existingBlock.id, data);
-        else addTimeBlock(data);
+        if (existingBlock) {
+            await upsertTimeBlock({ id: existingBlock.id as Id<"timeBlocks">, ...data });
+        } else {
+            await upsertTimeBlock(data);
+        }
         onClose();
     }
 
@@ -168,7 +176,7 @@ export function BlockModal({ open, onClose, existingBlock, defaultDate, defaultS
                     <div className="flex gap-2 pt-1">
                         {existingBlock && (
                             <Button variant="outline" size="icon" className="shrink-0 hover:text-destructive hover:border-destructive/50"
-                                onClick={() => { deleteTimeBlock(existingBlock.id); onClose(); }}>
+                                onClick={async () => { await removeTimeBlock({ id: existingBlock.id as Id<"timeBlocks"> }); onClose(); }}>
                                 <Trash2 className="w-4 h-4" />
                             </Button>
                         )}

@@ -11,6 +11,8 @@ import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import type { ProjectStatus } from '@/store/types';
 import { cn } from '@/lib/utils';
+import { useMutation } from 'convex/react';
+import { api } from '@/generated_mock/api';
 
 const PRESET_COLORS = ['#E11D48', '#2563EB', '#059669', '#D97706', '#7C3AED', '#DB2777', '#0891B2', '#65A30D'];
 const PRESET_EMOJIS = ['⚡', '🔮', '🌊', '🎸', '🚀', '🎯', '🔥', '💡', '🏗️', '🎵', '⚙️', '🌱'];
@@ -90,7 +92,7 @@ function ProjectCard({ projectId, onSelect }: { projectId: string; onSelect: () 
 
 export function ProjectsView({ onSelectProject }: ProjectsViewProps) {
     const projects = useDflowStore(useShallow((s) => s.projects));
-    const addProject = useDflowStore((s) => s.addProject);
+    const addProject = useMutation(api.projects.add);
     const [addOpen, setAddOpen] = useState(false);
     const [newName, setNewName] = useState('');
     const [newEmoji, setNewEmoji] = useState('⚡');
@@ -102,7 +104,7 @@ export function ProjectsView({ onSelectProject }: ProjectsViewProps) {
 
     function handleAdd() {
         if (!newName.trim()) return;
-        addProject({ name: newName.trim(), emoji: newEmoji, color: newColor, description: newDesc.trim(), status: 'active', totalHours: 0, weekProgress: 0 });
+        addProject({ name: newName.trim(), emoji: newEmoji, color: newColor, description: newDesc.trim(), status: 'active' });
         setNewName(''); setNewEmoji('⚡'); setNewColor(PRESET_COLORS[0]); setNewDesc('');
         setAddOpen(false);
     }
