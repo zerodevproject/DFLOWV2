@@ -2,7 +2,7 @@
 // DFLOW INITIAL STATE v7 — CLEAN SLATE
 // ===================================
 
-import type { UserProfile, Project, TimeBlock, HealthLog, FlowCycle, ParkingItem, TemplateSlot } from './types';
+import type { UserProfile, Project, TimeBlock, HealthLog, FlowCycle, ParkingItem } from './types';
 
 export const initialProjects: Project[] = [];
 
