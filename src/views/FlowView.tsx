@@ -9,6 +9,8 @@ import { Zap, CheckCircle2, XCircle, Clock, RefreshCw, ArrowRight } from 'lucide
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import type { DaySlotType, TemplateSlot } from '@/store/types';
+import { useMutation } from 'convex/react';
+import { api } from '@/generated_mock/api';
 
 // ── Week Scoreboard ──────────────────────────────────────────
 
@@ -124,7 +126,8 @@ function ProjectSwimlane() {
 
 function TemplateEditor() {
     const projects = useDflowStore(useShallow((s) => s.projects));
-    const { flowCycle, updateCycleSlots } = useDflowStore();
+    const { flowCycle } = useDflowStore();
+    const updateCycle = useMutation(api.flowCycles.update);
     const slots = flowCycle.slots;
     const queue = flowCycle.projectQueue;
 
@@ -135,7 +138,7 @@ function TemplateEditor() {
         return g;
     }, [slots, flowCycle.cycleLength]);
 
-    function toggleDay(dayIndex: number, slotType: DaySlotType, options?: { projectIndex?: number; healthAction?: ('fast24' | 'monk36' | 'exercise')[] }) {
+    async function toggleDay(dayIndex: number, slotType: DaySlotType, options?: { projectIndex?: number; healthAction?: ('fast24' | 'monk36' | 'exercise')[] }) {
         const existing = slots.find((s) =>
             s.dayIndex === dayIndex &&
             s.slotType === slotType &&
@@ -143,24 +146,28 @@ function TemplateEditor() {
             (slotType !== 'health' || (s.healthAction?.includes(options?.healthAction?.[0] as any)))
         );
 
-        if (existing) {
-            updateCycleSlots(slots.filter((s) => s.id !== existing.id));
-        } else {
-            const projectId = options?.projectIndex !== undefined ? queue[options.projectIndex] : undefined;
-            const project = projectId ? projects.find(p => p.id === projectId) : null;
+        const newSlots = existing
+            ? slots.filter((s) => s.id !== existing.id)
+            : [
+                ...slots,
+                {
+                    id: `ts-${Math.random().toString(36).slice(2, 8)}`,
+                    dayIndex,
+                    slotType,
+                    projectIndex: options?.projectIndex,
+                    healthAction: options?.healthAction,
+                    title: options?.projectIndex !== undefined
+                        ? (projects.find(p => p.id === queue[options.projectIndex!])?.name || 'Project')
+                        : (slotType === 'buffer' ? 'Buffer / Admin' : slotType === 'health' ? 'Metabolic' : 'Deep Work'),
+                    startTime: options?.healthAction ? '18:00' : '09:30',
+                    endTime: options?.healthAction ? '19:30' : '13:00',
+                }
+            ];
 
-            const newSlot: TemplateSlot = {
-                id: `ts-${Math.random().toString(36).slice(2, 8)}`,
-                dayIndex,
-                slotType,
-                projectIndex: options?.projectIndex,
-                healthAction: options?.healthAction,
-                title: project ? project.name : (slotType === 'buffer' ? 'Buffer / Admin' : slotType === 'health' ? 'Metabolic' : 'Deep Work'),
-                startTime: options?.healthAction ? '18:00' : '09:30',
-                endTime: options?.healthAction ? '19:30' : '13:00',
-            };
-            updateCycleSlots([...slots, newSlot]);
-        }
+        await updateCycle({
+            ...flowCycle,
+            slots: newSlots
+        });
     }
 
     const rows = useMemo(() => {
@@ -215,7 +222,7 @@ function TemplateEditor() {
                 <span className="text-[11px] text-muted-foreground font-bold uppercase tracking-tight">Duración de la Secuencia</span>
                 <div className="flex gap-2">
                     {[7, 10, 21].map(len => (
-                        <button key={len} onClick={() => useDflowStore.getState().updateCycleSettings({ cycleLength: len })} className={cn("px-2 py-1 rounded-lg text-xs font-black", flowCycle.cycleLength === len ? "bg-foreground text-background" : "bg-white border border-border text-muted-foreground")}>
+                        <button key={len} onClick={() => updateCycle({ ...flowCycle, cycleLength: len })} className={cn("px-2 py-1 rounded-lg text-xs font-black", flowCycle.cycleLength === len ? "bg-foreground text-background" : "bg-white border border-border text-muted-foreground")}>
                             {len}D
                         </button>
                     ))}
