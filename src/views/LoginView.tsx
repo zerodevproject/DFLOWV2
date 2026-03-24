@@ -7,7 +7,7 @@ import { Terminal, Lock, Mail, ArrowRight } from "lucide-react";
 
 export function LoginView() {
     const { signIn } = useAuthActions();
-    const [step, setStep] = useState<"signin" | "signup">("signin");
+    const [step, setStep] = useState<"signIn" | "signUp">("signIn");
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
 
@@ -94,20 +94,20 @@ export function LoginView() {
                     >
                         {loading ? "Cargando..." : (
                             <span className="flex items-center justify-center gap-2">
-                                {step === 'signin' ? "Entrar al Sistema" : "Crear Mi Cuenta"}
+                                {step === 'signIn' ? "Entrar al Sistema" : "Crear Mi Cuenta"}
                                 <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
                             </span>
                         )}
                     </Button>
 
                     <p className="text-center text-sm text-muted-foreground pt-2">
-                        {step === 'signin' ? "¿Nuevo en Dflow? " : "¿Ya tienes cuenta? "}
+                        {step === 'signIn' ? "¿Nuevo en Dflow? " : "¿Ya tienes cuenta? "}
                         <button
                             type="button"
-                            onClick={() => setStep(step === 'signin' ? 'signup' : 'signin')}
+                            onClick={() => setStep(step === 'signIn' ? 'signUp' : 'signIn')}
                             className="text-primary font-bold hover:underline"
                         >
-                            {step === 'signin' ? "Empieza aquí" : "Inicia Sesión"}
+                            {step === 'signIn' ? "Empieza aquí" : "Inicia Sesión"}
                         </button>
                     </p>
                 </form>
