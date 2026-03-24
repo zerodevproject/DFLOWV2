@@ -13,7 +13,7 @@ import { useDflowStore } from '@/store/useDflowStore';
 import type { TimeBlock, BlockType } from '@/store/types';
 import { cn } from '@/lib/utils';
 import { useMutation } from 'convex/react';
-import { api } from '../../../convex/_generated/api';
+import { api } from '@/generated_mock/api';
 import type { Id } from '../../../convex/_generated/dataModel';
 
 const BLOCK_TYPES: { value: BlockType; label: string; icon: string; color: string }[] = [

@@ -9,7 +9,7 @@ import { useDflowStore } from '@/store/useDflowStore';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { useMutation } from 'convex/react';
-import { api } from '../../convex/_generated/api';
+import { api } from '@/generated_mock/api';
 import type { Id } from '../../convex/_generated/dataModel';
 
 

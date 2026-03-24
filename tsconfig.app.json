@@ -24,9 +24,6 @@
     "paths": {
       "@/*": [
         "./src/*"
-      ],
-      "@convex/*": [
-        "./convex/*"
       ]
     },
     /* Linting */
@@ -38,7 +35,6 @@
     "noUncheckedSideEffectImports": true
   },
   "include": [
-    "src",
-    "convex"
+    "src"
   ]
 }
