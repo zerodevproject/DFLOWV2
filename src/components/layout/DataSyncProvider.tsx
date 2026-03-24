@@ -15,7 +15,7 @@ export function DataSyncProvider({ children }: { children: React.ReactNode }) {
 
     // Sync Projects
     useEffect(() => {
-        if (remoteProjects) {
+        if (remoteProjects !== undefined) {
             const mapped = remoteProjects.map((p: any) => ({
                 id: p._id,
                 name: p.name,
@@ -27,30 +27,36 @@ export function DataSyncProvider({ children }: { children: React.ReactNode }) {
                 objective: p.objective,
                 description: p.description
             }));
-            if (mapped.length > 0) setProjects(mapped);
+            setProjects(mapped);
         }
     }, [remoteProjects, setProjects]);
 
     // Sync Cycle
     useEffect(() => {
-        if (remoteCycle) {
-            setFlowCycle({
+        if (remoteCycle !== undefined) {
+            setFlowCycle(remoteCycle ? {
                 cycleLength: remoteCycle.cycleLength,
                 startDate: remoteCycle.startDate,
                 projectQueue: remoteCycle.projectQueue,
                 numCyclesAhead: remoteCycle.numCyclesAhead,
                 slots: remoteCycle.slots as any
+            } : {
+                cycleLength: 7,
+                startDate: new Date().toISOString().split('T')[0],
+                projectQueue: [],
+                slots: [],
+                numCyclesAhead: 2
             });
         }
     }, [remoteCycle, setFlowCycle]);
 
     // Sync User Profile
     useEffect(() => {
-        if (remoteUser) {
+        if (remoteUser !== undefined) {
             updateProfile({
-                name: remoteUser.name || 'Usuario',
-                tagline: remoteUser.tagline || 'Productor Metabólico',
-                avatar: remoteUser.image
+                name: remoteUser?.name || 'Usuario',
+                tagline: remoteUser?.tagline || 'Productor Metabólico',
+                avatar: remoteUser?.image
             });
         }
     }, [remoteUser, updateProfile]);
